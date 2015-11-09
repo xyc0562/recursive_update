@@ -7,7 +7,13 @@ module RecursiveUpdate
   # Exceptions
   class Error < StandardError;end
   class InvalidConfigurationError < Error;end
-  class ValidationError < Error;end
+  class ValidationError < Error
+    attr_accessor :errors
+    def initialize(errors, msg=nil)
+      @errors = errors
+      super msg
+    end
+  end
   class UnreachableStateError < Error;end
 
   ActiveRecord::Base.send :include, Engine

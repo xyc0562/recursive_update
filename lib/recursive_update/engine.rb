@@ -14,9 +14,9 @@ module RecursiveUpdate
         begin
           results = bulk_recursive_update({ models_name => [params] }, mappings, options)
           results[0]
-        rescue RecursiveUpdate::ValidationError
+        rescue ValidationError
           # Re-throw exception to fit into the format
-          raise RecursiveUpdate::ValidationError.new $!.errors[models_name][0]
+          raise ValidationError.new $!.errors[models_name][0]
         end
       end
 
@@ -54,7 +54,7 @@ module RecursiveUpdate
       # +collection_validator+:
       # An n>2-element array of format [Module, method, *args] is passed in. Once set, collection of interest
       # will be validated by its parent model using Module.method(collections, *args) function as passed in.
-      # RecursiveUpdate::ValidationError will be thrown upon invalid records. This also preserves
+      # ValidationError will be thrown upon invalid records. This also preserves
       # order of records as they were passed in
       # This option defaults to +false+
       #
@@ -259,12 +259,12 @@ module RecursiveUpdate
             args = validator_options[2..-1]
             begin
               mod.send method, many_records, *args
-            rescue RecursiveUpdate::ValidationError
+            rescue ValidationError
               # Lack one layer in the error message, need to add back
-              raise RecursiveUpdate::ValidationError.new ck => $!.errors
+              raise ValidationError.new ck => $!.errors
             end
           end
-        rescue RecursiveUpdate::ValidationError
+        rescue ValidationError
           _raise_validation_error models_name, $!.errors, idx
         end
       end
@@ -304,7 +304,7 @@ module RecursiveUpdate
               method = _creator[1]
               attrs = _creator[2..-1]
               model = mod.send method, klass, attributes, *attrs
-            rescue RecursiveUpdate::ValidationError
+            rescue ValidationError
               _raise_validation_error models_name, $!.errors, idx
             end
           else
@@ -325,9 +325,9 @@ module RecursiveUpdate
       private
       def _raise_validation_error(models_name, errors, idx=nil)
         if idx
-          raise RecursiveUpdate::ValidationError.new(models_name => [nil]*idx + [errors])
+          raise ValidationError.new(models_name => [nil]*idx + [errors])
         else
-          raise RecursiveUpdate::ValidationError.new(models_name => errors)
+          raise ValidationError.new(models_name => errors)
         end
       end
     end

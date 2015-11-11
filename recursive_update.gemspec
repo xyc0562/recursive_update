@@ -9,9 +9,10 @@ Gem::Specification.new do |s|
   s.version     = RecursiveUpdate::VERSION
   s.authors     = ["Yecheng Xu"]
   s.email       = ["xyc0562@gmail.com"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of RecursiveUpdate."
-  s.description = "TODO: Description of RecursiveUpdate."
+  s.homepage    = "https://github.com/xyc0562/recursive_update"
+  s.summary     = "Customized nested & batch resource update and creation"
+  s.description = "This Gem allows users to conveniently create/update arbitrarily nested resources in a batch. It also comes" +
+      "with properly nested error messages"
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]

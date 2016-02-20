@@ -169,14 +169,28 @@ module RecursiveUpdate
           params[models_name].each_with_index do |each_params, idx|
             # Override attributes if necessary
             override_attributes _overrides, each_params, params
-            # Root records must have ids with them, unless root creation is allowed explicitly
-            model = _update_all_attributes _creator, each_params, idx, klass, mapping_values, models_name, options
-            # Attach entry to parent if not already attached
-            unless is_root
-              models = parent.send models_name
-              models << model unless models.include? model
-              # Original order of records only needed if a parent exists
-              models_original_order << model
+            if each_params[:_destroy]
+              # destroy records if not root and _destroy is passed in
+              raise InvalidConfigurationError.new '_destroy option is not allowed in the root element' if is_root
+              # Destroy
+              entry = parent.send(models_name).find_by(id: each_params[:id])
+              # nil will be removed before sending back results if things turns out successful
+              models_original_order << nil
+              begin
+                entry.destroy! if entry
+              rescue ActiveRecord::RecordNotDestroyed
+                _raise_validation_error models_name, $!.message, idx
+              end
+            else
+              # Root records must have ids with them, unless root creation is allowed explicitly
+              model = _update_all_attributes _creator, each_params, idx, klass, mapping_values, models_name, options
+              # Attach entry to parent if not already attached
+              unless is_root
+                models = parent.send models_name
+                models << model unless models.include? model
+                # Original order of records only needed if a parent exists
+                models_original_order << model
+              end
             end
           end
         else
@@ -194,7 +208,7 @@ module RecursiveUpdate
         end
         # For root records, return updated records
         # For child records, return updated entries in original order
-        is_root ? klass.where(id: params[models_name].map {|p| p[:id]}) : models_original_order
+        is_root ? klass.where(id: params[models_name].map {|p| p[:id]}) : models_original_order.compact
       end
 
       def override_attributes(_overrides, sub_params, params)

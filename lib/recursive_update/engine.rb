@@ -169,7 +169,7 @@ module RecursiveUpdate
           params[models_name].each_with_index do |each_params, idx|
             # Override attributes if necessary
             override_attributes _overrides, each_params, params
-            if each_params[:_destroy]
+            if !each_params.is_a?(Array) && each_params[:_destroy]
               # destroy records if not root and _destroy is passed in
               raise InvalidConfigurationError.new '_destroy option is not allowed in the root element' if is_root
               # Destroy

@@ -32,6 +32,7 @@ module RecursiveUpdate
       _batch_create_params = options.delete :batch_create
       _update_params = options.delete :update
       _batch_update_params = options.delete :batch_update
+      reducer = options.delete :reducer || -> (x) { x }
       root_name = Utils.instance_name(self).pluralize.to_sym
 
       if _create_params
@@ -76,19 +77,19 @@ module RecursiveUpdate
       end
 
       define_method :create_params do
-        params.permit _create_params
+        reducer.call params.permit(_create_params)
       end
 
       define_method :update_params do
-        params.permit _update_params
+        reducer.call params.permit(_update_params)
       end
 
       define_method :batch_create_params do
-        params.permit _batch_create_params
+        { root_name => reducer.call(params.permit(_batch_create_params)) }
       end
 
       define_method :batch_update_params do
-        params.permit _batch_update_params
+        { root_name => reducer.call(params.permit(_batch_create_params)) }
       end
     end
   end

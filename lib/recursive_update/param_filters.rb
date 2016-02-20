@@ -32,7 +32,8 @@ module RecursiveUpdate
       _batch_create_params = options.delete :batch_create
       _update_params = options.delete :update
       _batch_update_params = options.delete :batch_update
-      reducer = options.delete :reducer || -> (x) { x }
+      # TODO: Fix reducer, currently broken for batch create and update
+      reducer = options.delete(:reducer) || -> (x) { x }
       root_name = Utils.instance_name(self).pluralize.to_sym
 
       if _create_params

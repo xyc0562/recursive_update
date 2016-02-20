@@ -169,15 +169,15 @@ module RecursiveUpdate
           params[models_name].each_with_index do |each_params, idx|
             # Override attributes if necessary
             override_attributes _overrides, each_params, params
-            if !each_params.is_a?(Array) && each_params[:_destroy]
+            if each_params.respond_to?(:keys) && each_params[:_destroy]
               # destroy records if not root and _destroy is passed in
               raise InvalidConfigurationError.new '_destroy option is not allowed in the root element' if is_root
               # Destroy
               entry = parent.send(models_name).find_by(id: each_params[:id])
-              # nil will be removed before sending back results if things turns out successful
-              models_original_order << nil
               begin
                 entry.destroy! if entry
+                # nil will be removed before sending back results if things turns out successful
+                models_original_order << nil
               rescue ActiveRecord::RecordNotDestroyed
                 _raise_validation_error models_name, $!.message, idx
               end

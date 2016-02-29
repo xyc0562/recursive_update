@@ -158,7 +158,7 @@ module RecursiveUpdate
           ids = params[models_name].map do |each_params|
             each_params.respond_to?(:keys) ? each_params[:id] : each_params
           end
-          parent.send(models_name).where('id NOT IN (?)', ids).destroy_all
+          parent.send(models_name).where("#{models_name}.id NOT IN (?)", ids).destroy_all
         end
         models_original_order = []
         if has_many

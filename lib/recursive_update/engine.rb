@@ -157,10 +157,10 @@ module RecursiveUpdate
           end
           ids = params[models_name].map do |each_params|
             each_params.respond_to?(:keys) ? each_params[:id] : each_params
-          end
-          parent.send(models_name).each do |entry|
-            entry.destroy! unless ids.include? entry.id
-          end
+          end.compact
+          col = parent.send(models_name)
+          existing_ids = col.map(&:id)
+          col.destroy *(existing_ids - ids)
         end
         models_original_order = []
         if has_many

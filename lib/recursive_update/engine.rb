@@ -155,12 +155,10 @@ module RecursiveUpdate
           if is_root
             raise InvalidConfigurationError.new 'Destructive option is not allowed in the root element'
           end
-          parent.send(models_name).destroy_all
-          # After cleaning, id in each record is no longer needed
-          # as they will be created from scratch anyway
-          params[models_name].each do |each_params|
-            each_params.delete :id if each_params.respond_to? :keys
+          ids = params[models_name].map do |each_params|
+            each_params.respond_to?(:keys) ? each_params[:id] : each_params
           end
+          parent.send(models_name).where('id NOT IN (?)', ids).destroy_all
         end
         models_original_order = []
         if has_many

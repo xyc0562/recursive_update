@@ -237,7 +237,11 @@ module RecursiveUpdate
         end
         # Save all attached associations
         if model.valid?
-          model.save!
+          begin
+            model.save!
+          rescue ValidationError
+            _raise_validation_error models_name, $!.errors, idx
+          end
           # After saving the model, update its primary key in parameters
           params[:id] = model.id
         else
@@ -307,8 +311,15 @@ module RecursiveUpdate
             _raise_validation_error models_name, {id: 'does not exist'}, idx
           end
           model = klass.find params[:id]
-          unless id_only || model.update_attributes(attributes)
-            _raise_validation_error models_name, model.errors.messages, idx
+          unless id_only
+            success = false
+            begin
+              success = model.update_attributes(attributes)
+            rescue
+              ValidationError
+              _raise_validation_error models_name, $!.errors, idx
+            end
+            _raise_validation_error models_name, model.errors.messages, idx unless success
           end
         else
           # Otherwise, create

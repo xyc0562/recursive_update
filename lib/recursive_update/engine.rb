@@ -188,6 +188,10 @@ module RecursiveUpdate
               unless is_root
                 models = parent.send models_name
                 models << model unless models.include? model
+                if mapping_options[:save_parent_after_save]
+                  parent.reload
+                  parent.save!
+                end
                 # Original order of records only needed if a parent exists
                 models_original_order << model
               end
@@ -200,7 +204,7 @@ module RecursiveUpdate
             # Override attributes if necessary
             override_attributes _overrides, model_params, params
             model = _update_all_attributes _creator, model_params, nil, klass, mapping_values, models_name, options
-            # Attach entry to parent if not already attached
+            #each_params Attach entry to parent if not already attached
             unless is_root
               parent.send "#{models_name}=", model
             end

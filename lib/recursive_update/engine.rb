@@ -147,7 +147,8 @@ module RecursiveUpdate
           # No further processing is needed
           return
         end
-        klass ||= models_name.to_s.singularize.classify.constantize
+        models_object_name = models_name.to_s.ends_with?('_ids') ? models_name[0..-5].pluralize.to_sym : models_name
+        klass ||= models_object_name.to_s.singularize.classify.constantize
         # Need to cleanse all records
         # destructive only works for has_many relationship
         if has_many && _destructive
@@ -158,7 +159,7 @@ module RecursiveUpdate
           ids = params[models_name].map do |each_params|
             each_params.respond_to?(:keys) ? each_params[:id] : each_params
           end.compact
-          col = parent.send(models_name)
+          col = parent.send(models_object_name)
           existing_ids = col.map(&:id)
           col.destroy *(existing_ids - ids)
         end
@@ -183,10 +184,10 @@ module RecursiveUpdate
               end
             else
               # Root records must have ids with them, unless root creation is allowed explicitly
-              model = _update_all_attributes _creator, each_params, idx, klass, mapping_values, models_name, options
+              model = _update_all_attributes _creator, each_params, idx, klass, mapping_values, models_object_name, options
               # Attach entry to parent if not already attached
               unless is_root
-                models = parent.send models_name
+                models = parent.send models_object_name
                 models << model unless models.include? model
                 if mapping_options[:save_parent_after_save]
                   parent.reload

@@ -320,8 +320,7 @@ module RecursiveUpdate
             success = false
             begin
               success = model.update_attributes(attributes)
-            rescue
-              ValidationError
+            rescue ValidationError
               _raise_validation_error models_name, $!.errors, idx
             end
             _raise_validation_error models_name, model.errors.messages, idx unless success

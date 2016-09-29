@@ -354,7 +354,7 @@ module RecursiveUpdate
       private
       def _raise_validation_error(models_name, errors, idx=nil)
         if idx
-          raise ValidationError.new(models_name => [nil]*idx + [errors])
+          raise ValidationError.new(models_name => { idx => errors })
         else
           raise ValidationError.new(models_name => errors)
         end

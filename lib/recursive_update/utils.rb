@@ -5,7 +5,7 @@ module RecursiveUpdate
       # Drop nested values from a hash
       def drop_nested_values(h)
         h.each do |k, v|
-          h.delete k if [Hash, Array, ActionController::Parameters].include? v.class
+          h.delete k if [Hash, Array, HashWithIndifferentAccess, ActionController::Parameters].include? v.class
         end
       end
 

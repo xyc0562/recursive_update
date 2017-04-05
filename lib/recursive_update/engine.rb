@@ -193,9 +193,9 @@ module RecursiveUpdate
                   parent.reload
                   parent.save!
                 end
-                # Original order of records only needed if a parent exists
-                models_original_order << model
               end
+              # Original order of records only needed if a parent exists
+              models_original_order << model
             end
           end
         else
@@ -213,7 +213,8 @@ module RecursiveUpdate
         end
         # For root records, return updated records
         # For child records, return updated entries in original order
-        is_root ? klass.where(id: params[models_name].map {|p| p[:id]}) : models_original_order.compact
+#        is_root ? klass.where(id: params[models_name].map {|p| p[:id]}) : models_original_order.compact
+        models_original_order.compact
       end
 
       def override_attributes(_overrides, sub_params, params)
